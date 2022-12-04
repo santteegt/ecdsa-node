@@ -1,7 +1,8 @@
 import { useState } from "react";
 import server from "./server";
+import { signTx } from './bwallet';
 
-function Transfer({ address, setBalance }) {
+function Transfer({ address, nonce, setBalance, setNonce }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
@@ -9,16 +10,22 @@ function Transfer({ address, setBalance }) {
 
   async function transfer(evt) {
     evt.preventDefault();
-
     try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
+      const [txSignature, txRecoveryBit] = await signTx(
+        JSON.stringify({
+          to: recipient,
+          value: parseInt(sendAmount),
+          nonce: nonce + 1,
+        })
+      );
+      const { data } = await server.post(`send`, {
         sender: address,
-        amount: parseInt(sendAmount),
+        txAmount: parseInt(sendAmount),
         recipient,
+        txSignature, txRecoveryBit
       });
-      setBalance(balance);
+      setBalance(data.balance);
+      setNonce(data.nonce);
     } catch (ex) {
       alert(ex.response.data.message);
     }

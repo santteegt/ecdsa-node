@@ -5,7 +5,8 @@ import { useState } from "react";
 
 function App() {
   const [balance, setBalance] = useState(0);
-  const [address, setAddress] = useState("");
+  const [nonce, setNonce] = useState(0);
+  const [address, setAddress] = useState('');
 
   return (
     <div className="app">
@@ -14,8 +15,15 @@ function App() {
         setBalance={setBalance}
         address={address}
         setAddress={setAddress}
+        currentNonce={nonce}
+        setNonce={setNonce}
       />
-      <Transfer setBalance={setBalance} address={address} />
+      <Transfer
+        address={address}
+        nonce={nonce}
+        setBalance={setBalance}
+        setNonce={setNonce}
+      />
     </div>
   );
 }
